@@ -43,11 +43,10 @@ public class LoginController {
             logger.debug("User trouvé : {}", existingUser.getPasswordHash().trim());
             logger.debug("Mot de passe introduit : {}", password.trim());
 
+            // Comparaison des mots de passe
             if (existingUser.getPasswordHash().trim().equals(password.trim())) {
                 logger.debug("Mot de passe correcte");
-
-                // Stocker l'utilisateur dans la session après une connexion réussie
-                session.setAttribute("user", existingUser); // Utilisation correcte de la session
+                session.setAttribute("user", existingUser); // Ajoutez l'utilisateur à la session
                 return "redirect:/index";
             } else {
                 logger.debug("Mot de passe incorrect");
@@ -55,4 +54,5 @@ public class LoginController {
             }
         }
     }
+
 }

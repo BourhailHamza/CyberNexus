@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${chatRoom.name}">Salon de Chat</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">CyberNexus</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/profile">Perfil</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/create-chat-room">Créer un Salon</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Déconnecter</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <h1>Salon: <span th:text="${chatRoom.name}"></span></h1>
+  <p th:text="${chatRoom.description}"></p>
+
+  <h3>Messages:</h3>
+  <ul class="list-group">
+    <li class="list-group-item" th:each="message : ${messages}">
+      <strong th:text="${message.user.username}">User</strong>:
+      <span th:text="${message.content}"></span>
+      <small class="text-muted" th:text="${message.formattedDate}"></small>
+
+      <!-- Bouton de suppression si l'utilisateur est l'auteur -->
+      <span th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}">
+                <form th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                </form>
+            </span>
+
+      <!-- Bouton de signalement pour tous les utilisateurs -->
+      <form th:action="@{/message/report/{id}(id=${message.id})}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-sm btn-warning" th:disabled="${message.reported}">Signaler</button>
+      </form>
+    </li>
+  </ul>
+
+  <!-- Formulaire d'ajout de message -->
+  <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-3">
+    <div class="form-group">
+      <textarea class="form-control" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Envoyer</button>
+  </form>
+</div>
+
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

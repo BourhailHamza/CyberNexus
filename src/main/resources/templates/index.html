@@ -18,6 +18,9 @@
                 <a class="nav-link" href="/profile">Perfil</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="/create-chat-room">Créer un Salon</a> <!-- Nouveau lien ajouté ici -->
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/logout">Desconectar</a>
             </li>
         </ul>
@@ -28,13 +31,15 @@
     <h1>Bienvenido, <span th:text="${user.username}"></span>!</h1>
     <p>Explora los salones de chat disponibles:</p>
 
+    <a href="/create-chat-room" class="btn btn-primary mb-4">Créer un nouveau salon</a> <!-- Ajoutez ce lien -->
+
     <div class="row">
         <div th:each="chatRoom : ${chatRooms}" class="col-md-4">
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${chatRoom.name}"></h5>
                     <p class="card-text" th:text="${chatRoom.description}"></p>
-                    <a th:href="@{/chat/{id}(id=${chatRoom.id})}" class="btn btn-primary">Entrar al salón</a>
+                    <a th:href="@{/chat/{id}(id=${chatRoom.id})}" class="btn btn-primary">Joindre salon</a>
                 </div>
             </div>
         </div>

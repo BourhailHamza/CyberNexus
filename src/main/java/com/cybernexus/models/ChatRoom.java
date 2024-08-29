@@ -39,4 +39,5 @@ public class ChatRoom {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
