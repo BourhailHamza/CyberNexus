@@ -14,15 +14,9 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="/profile">Perfil</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/create-chat-room">Créer un Salon</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Déconnecter</a>
-      </li>
+      <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
+      <li class="nav-item"><a class="nav-link" href="/create-chat-room">Créer un Salon</a></li>
+      <li class="nav-item"><a class="nav-link" href="/logout">Déconnecter</a></li>
     </ul>
   </div>
 </nav>
@@ -39,11 +33,11 @@
       <small class="text-muted" th:text="${message.formattedDate}"></small>
 
       <!-- Bouton de suppression si l'utilisateur est l'auteur -->
-      <span th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}">
-                <form th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
-                </form>
-            </span>
+      <form th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}"
+            th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}"
+            method="post" style="display: inline;">
+        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+      </form>
 
       <!-- Bouton de signalement pour tous les utilisateurs -->
       <form th:action="@{/message/report/{id}(id=${message.id})}" method="post" style="display: inline;">
@@ -54,13 +48,10 @@
 
   <!-- Formulaire d'ajout de message -->
   <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-3">
-    <div class="form-group">
-      <textarea class="form-control" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
-    </div>
+    <textarea class="form-control" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
     <button type="submit" class="btn btn-primary mt-2">Envoyer</button>
   </form>
 </div>
-
 
 <script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>

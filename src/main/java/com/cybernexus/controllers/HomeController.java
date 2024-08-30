@@ -2,6 +2,7 @@ package com.cybernexus.controllers;
 
 import com.cybernexus.models.ChatRoom;
 import com.cybernexus.models.Message;
+import com.cybernexus.models.Report;
 import com.cybernexus.models.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Controller
 public class HomeController {
@@ -54,14 +56,14 @@ public class HomeController {
             return "redirect:/index?error=notFound";
         }
 
-        List<Message> messages = entityManager.createQuery("SELECT m FROM Message m WHERE m.chatRoom.id = :chatRoomId ORDER BY m.createdAt ASC", Message.class)
+        List<Message> messages = entityManager.createQuery("SELECT m FROM Message m WHERE m.chatRoom.id = :chatRoomId", Message.class)
                 .setParameter("chatRoomId", id).getResultList();
 
         // Formatage de la date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm");
+        /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm");
         for (Message message : messages) {
             message.setFormattedDate(message.getCreatedAt().format(formatter));
-        }
+        }*/
 
         model.addAttribute("user", currentUser);
         model.addAttribute("chatRoom", chatRoom);
@@ -119,6 +121,72 @@ public class HomeController {
 
         model.addAttribute("user", currentUser);
         return "createChatRoom";
+    }
+
+    @PostMapping("/create-chat-room")
+    @Transactional
+    public String createChatRoom(@RequestParam String name, @RequestParam String description, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setName(name);
+        chatRoom.setDescription(description);
+        chatRoom.setCreatedBy(currentUser); // Establecemos el usuario como entidad relacionada
+        chatRoom.setCreatedAt(LocalDateTime.now());
+        chatRoom.setUserId(currentUser.getId());
+
+        entityManager.persist(chatRoom);
+
+        return "redirect:/index";
+    }
+
+    @PostMapping("/chat-room/delete/{id}")
+    @Transactional
+    public String deleteChatRoom(@PathVariable("id") Long chatRoomId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        ChatRoom chatRoom = entityManager.find(ChatRoom.class, chatRoomId);
+
+        if (chatRoom != null && chatRoom.getCreatedBy().getId().equals(currentUser.getId())) {
+            entityManager.remove(chatRoom);
+        }
+
+        return "redirect:/index";
+    }
+
+    @PostMapping("/chat/{chatRoomId}/message/report/{messageId}")
+    @Transactional
+    public String reportMessage(@PathVariable("chatRoomId") Long chatRoomId,
+                                @PathVariable("messageId") Long messageId,
+                                @RequestParam String reason,
+                                HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        Message message = entityManager.find(Message.class, messageId);
+
+        if (message != null) {
+            Report report = new Report();
+            report.setMessage(message);
+            report.setReportedBy(currentUser);
+            report.setReason(reason);
+            report.setCreatedAt(LocalDateTime.now());
+
+            entityManager.persist(report);
+        }
+
+        return "redirect:/chat/" + chatRoomId;
     }
 
     @GetMapping("/logout")

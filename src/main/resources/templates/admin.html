@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrar Mensajes Denunciados</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">CyberNexus</a>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item"><a class="nav-link" href="/admin/reports">Mensajes Denunciados</a></li>
+      <li class="nav-item"><a class="nav-link" href="/logout">Déconnecter</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <h1>Mensajes Denunciados</h1>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>Mensaje</th>
+      <th>Motivo de la Denuncia</th>
+      <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="report : ${reports}">
+      <td th:text="${report.message.user.username}">Usuario</td>
+      <td th:text="${report.message.content}">Mensaje</td>
+      <td th:text="${report.reason}">Motivo</td>
+      <td>
+        <form th:action="@{/admin/message/delete/{id}(id=${report.message.id})}" method="post" style="display: inline;">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar Mensaje</button>
+        </form>
+        <form th:action="@{/admin/message/unreport/{id}(id=${report.id})}" method="post" style="display: inline;">
+          <button type="submit" class="btn btn-sm btn-secondary">Quitar Reporte</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

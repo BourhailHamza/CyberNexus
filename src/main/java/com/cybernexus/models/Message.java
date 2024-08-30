@@ -22,8 +22,8 @@ public class Message {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    /*@Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;*/
 
     @Transient
     private String formattedDate;
@@ -73,13 +73,13 @@ public class Message {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
+    /*public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
+    }*/
 
     public String getFormattedDate() {
         return formattedDate;

@@ -18,7 +18,7 @@
                 <a class="nav-link" href="/profile">Perfil</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/create-chat-room">Créer un Salon</a> <!-- Nouveau lien ajouté ici -->
+                <a class="nav-link" href="/create-chat-room">Créer un Salon</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/logout">Desconectar</a>
@@ -31,7 +31,7 @@
     <h1>Bienvenido, <span th:text="${user.username}"></span>!</h1>
     <p>Explora los salones de chat disponibles:</p>
 
-    <a href="/create-chat-room" class="btn btn-primary mb-4">Créer un nouveau salon</a> <!-- Ajoutez ce lien -->
+    <a href="/create-chat-room" class="btn btn-primary mb-4">Créer un nouveau salon</a>
 
     <div class="row">
         <div th:each="chatRoom : ${chatRooms}" class="col-md-4">
@@ -40,6 +40,12 @@
                     <h5 class="card-title" th:text="${chatRoom.name}"></h5>
                     <p class="card-text" th:text="${chatRoom.description}"></p>
                     <a th:href="@{/chat/{id}(id=${chatRoom.id})}" class="btn btn-primary">Joindre salon</a>
+                    <!-- Afficher le bouton Supprimer seulement si l'utilisateur connecté est le créateur du salon -->
+                    <div th:if="${chatRoom.createdBy.id == user.id}">
+                        <form th:action="@{/chat-room/delete/{id}(id=${chatRoom.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger mt-2">Supprimer</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
