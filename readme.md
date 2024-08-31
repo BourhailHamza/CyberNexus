@@ -73,4 +73,4 @@ La base de données utilise plusieurs tables pour gérer les utilisateurs, les r
 
 ## Licence
 
-Ce projet est sous licence MIT. Vous êtes libre d'utiliser, de modifier et de distribuer ce logiciel sous les conditions de la licence. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Vous êtes libre d'utiliser, de modifier et de distribuer ce logiciel sous les conditions de la licence. Voir le fichier [LICENSE](LICENSE.md) pour plus de détails.
