@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @Controller
@@ -15,6 +16,9 @@ public class RegisterController {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/register")
     public String showRegistrationPage() {
@@ -45,7 +49,7 @@ public class RegisterController {
             User newUser = new User();
             newUser.setUsername(username);
             newUser.setEmail(email);
-            newUser.setPasswordHash(password);
+            newUser.setPasswordHash(passwordEncoder.encode(password));
 
             entityManager.persist(newUser);
 

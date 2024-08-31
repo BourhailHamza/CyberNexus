@@ -1,4 +1,4 @@
-package com.cybernexus.controller;
+package com.cybernexus.controllers;
 
 import com.cybernexus.models.User;
 import org.slf4j.Logger;
@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpSession; // Assurez-vous d'importer HttpSession
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Controller
 public class LoginController {
@@ -20,39 +25,50 @@ public class LoginController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @GetMapping("/login")
+    @GetMapping("/loginPage")
     public String showLoginPage() {
         return "loginPage";
     }
 
-    @PostMapping("/login")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public String adminOnly() {
+        return "admin"; // Cambiado para retornar la vista de admin de Thymeleaf
+    }
+
+    @Secured("ROLE_USER")
+    @GetMapping("/user")
+    public String userOnly() {
+        return "index"; // Cambia esto a la vista que deseas mostrar al usuario
+    }
+
+    @PostMapping("/loginPage")
     @Transactional
-    public String handleLogin(@RequestParam String email, @RequestParam String password, HttpSession session) {
+    public String handleLogin(@RequestParam String username, @RequestParam String password, HttpSession session) {
         logger.debug("Arrive login");
 
-        String query = "SELECT u FROM User u WHERE u.email = :email";
+        String query = "SELECT u FROM User u WHERE u.username = :username";
         List<User> users = entityManager.createQuery(query, User.class)
-                .setParameter("email", email)
+                .setParameter("username", username)
                 .getResultList();
 
         if (users.isEmpty()) {
-            logger.debug("Utilisateur non trouvé avec l'email: {}", email);
-            return "redirect:/login?error=userNotFound";
+            logger.debug("Utilisateur non trouvé avec l'email: {}", username);
+            return "redirect:/loginPage?error=userNotFound";
         } else {
             User existingUser = users.get(0);
             logger.debug("User trouvé : {}", existingUser.getPasswordHash().trim());
             logger.debug("Mot de passe introduit : {}", password.trim());
 
-            // Comparaison des mots de passe
-            if (existingUser.getPasswordHash().trim().equals(password.trim())) {
+            PasswordEncoder encoder = new BCryptPasswordEncoder();
+            if (encoder.matches(password, existingUser.getPasswordHash().trim())) {
                 logger.debug("Mot de passe correcte");
-                session.setAttribute("user", existingUser); // Ajoutez l'utilisateur à la session
+                session.setAttribute("user", existingUser);
                 return "redirect:/index";
             } else {
                 logger.debug("Mot de passe incorrect");
-                return "redirect:/login?error=invalidPassword";
+                return "redirect:/loginPage?error=invalidPassword";
             }
         }
     }
-
 }

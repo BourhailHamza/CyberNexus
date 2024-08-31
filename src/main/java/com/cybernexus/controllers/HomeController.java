@@ -29,9 +29,9 @@ public class HomeController {
     public String showIndex(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
 
-        if (currentUser == null) {
+        /*if (currentUser == null) {
             return "redirect:/login";
-        }
+        }*/
 
         String query = "SELECT c FROM ChatRoom c";
         List<ChatRoom> chatRooms = entityManager.createQuery(query, ChatRoom.class).getResultList();
