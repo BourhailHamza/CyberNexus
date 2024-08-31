@@ -2,6 +2,7 @@ package com.cybernexus.models;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "chat_rooms")
@@ -18,14 +19,14 @@ public class ChatRoom {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
 
     public Long getId() {
         return id;
@@ -67,11 +68,11 @@ public class ChatRoom {
         this.createdAt = createdAt;
     }
 
-    public Long getUserId() {
-        return userId;
+    public List<Message> getMessages() {
+        return messages;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 }

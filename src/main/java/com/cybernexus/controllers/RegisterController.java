@@ -1,6 +1,7 @@
 package com.cybernexus.controller;
 
 import com.cybernexus.models.User;
+import com.cybernexus.models.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,12 @@ public class RegisterController {
             newUser.setUsername(username);
             newUser.setEmail(email);
             newUser.setPasswordHash(passwordEncoder.encode(password));
+
+            Role userRole = entityManager.createQuery("SELECT r FROM Role r WHERE r.roleName = :roleName", Role.class)
+                    .setParameter("roleName", "USER")
+                    .getSingleResult();
+
+            newUser.getRoles().add(userRole);
 
             entityManager.persist(newUser);
 

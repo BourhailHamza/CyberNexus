@@ -25,7 +25,7 @@ public class LoginController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @GetMapping("/loginPage")
+    @GetMapping("/login")
     public String showLoginPage() {
         return "loginPage";
     }
@@ -33,42 +33,8 @@ public class LoginController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public String adminOnly() {
-        return "admin"; // Cambiado para retornar la vista de admin de Thymeleaf
+        logger.debug("ADMIN USER");
+        return "reports";
     }
 
-    @Secured("ROLE_USER")
-    @GetMapping("/user")
-    public String userOnly() {
-        return "index"; // Cambia esto a la vista que deseas mostrar al usuario
-    }
-
-    @PostMapping("/loginPage")
-    @Transactional
-    public String handleLogin(@RequestParam String username, @RequestParam String password, HttpSession session) {
-        logger.debug("Arrive login");
-
-        String query = "SELECT u FROM User u WHERE u.username = :username";
-        List<User> users = entityManager.createQuery(query, User.class)
-                .setParameter("username", username)
-                .getResultList();
-
-        if (users.isEmpty()) {
-            logger.debug("Utilisateur non trouvé avec l'email: {}", username);
-            return "redirect:/loginPage?error=userNotFound";
-        } else {
-            User existingUser = users.get(0);
-            logger.debug("User trouvé : {}", existingUser.getPasswordHash().trim());
-            logger.debug("Mot de passe introduit : {}", password.trim());
-
-            PasswordEncoder encoder = new BCryptPasswordEncoder();
-            if (encoder.matches(password, existingUser.getPasswordHash().trim())) {
-                logger.debug("Mot de passe correcte");
-                session.setAttribute("user", existingUser);
-                return "redirect:/index";
-            } else {
-                logger.debug("Mot de passe incorrect");
-                return "redirect:/loginPage?error=invalidPassword";
-            }
-        }
-    }
 }

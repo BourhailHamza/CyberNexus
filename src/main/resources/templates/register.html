@@ -7,30 +7,34 @@
     <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card mt-5">
-                <div class="card-header text-center">
-                    <h4>Create an Account</h4>
-                </div>
-                <div class="card-body">
-                    <form action="/register" method="post" th:action="@{/register}">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Register</button>
-                    </form>
-                </div>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-success text-white text-center">
+                <h4>Créer un Compte</h4>
+            </div>
+            <div class="card-body p-5">
+                <form action="/register" method="post" th:action="@{/register}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nom d'utilisateur</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Entrer votre nom d'utilisateur" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Adresse email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Entrer votre email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Entrer votre mot de passe" required>
+                    </div>
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-success">S'inscrire</button>
+                    </div>
+                    <div class="text-center">
+                        <p>Vous avez déjà un compte ? <a th:href="@{/login}" class="text-success">Connectez-vous</a></p>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

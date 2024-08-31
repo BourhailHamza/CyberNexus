@@ -26,24 +26,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/", "/index", "/register", "/loginPage", "/css/**", "/js/**", "/webjars/**").permitAll()
+                        .antMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/webjars/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        .antMatchers("/user/**").hasRole("USER")
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
                 .formLogin((form) -> form
-                        .loginPage("/loginPage")
+                        .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/index", true)
+                        .successHandler(customAuthenticationSuccessHandler())
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout((logout) -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/loginPage?logout")
+                        .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                );
+                )
+                .exceptionHandling().accessDeniedPage("/error");
         return http.build();
     }
 
@@ -60,5 +61,10 @@ public class SecurityConfig {
                 .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
     }
 }

@@ -15,7 +15,6 @@ public class UserController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Créer un nouvel utilisateur
     @PostMapping("/create")
     @Transactional
     public User createUser(@RequestBody User user) {
@@ -24,7 +23,6 @@ public class UserController {
         return user;
     }
 
-    // Trouver un utilisateur par son username
     @GetMapping("/{username}")
     public User getUserByUsername(@PathVariable String username) {
         String query = "SELECT u FROM User u WHERE u.username = :username";
@@ -34,7 +32,6 @@ public class UserController {
         return users.isEmpty() ? null : users.get(0);
     }
 
-    // Mettre à jour un utilisateur
     @PutMapping("/{id}")
     @Transactional
     public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
@@ -55,7 +52,6 @@ public class UserController {
         return user;
     }
 
-    // Supprimer un utilisateur
     @DeleteMapping("/{id}")
     @Transactional
     public void deleteUser(@PathVariable Long id) {
@@ -65,7 +61,6 @@ public class UserController {
         }
     }
 
-    // Lister tous les utilisateurs
     @GetMapping("/all")
     public List<User> getAllUsers() {
         String query = "SELECT u FROM User u";

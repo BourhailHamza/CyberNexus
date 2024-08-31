@@ -1,7 +1,7 @@
 package com.cybernexus.models;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "messages")
@@ -22,23 +22,20 @@ public class Message {
     @Column(nullable = false)
     private String content;
 
-    /*@Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;*/
-
-    @Transient
-    private String formattedDate;
-
     @Column(nullable = false)
     private boolean reported = false;
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports;
 
     public Message() {
     }
 
     public Message(ChatRoom chatRoom, User user, String content) {
-        this();
         this.chatRoom = chatRoom;
         this.user = user;
         this.content = content;
+        this.reported = false;
     }
 
     public Long getId() {
@@ -73,27 +70,19 @@ public class Message {
         this.content = content;
     }
 
-    /*public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }*/
-
-    public String getFormattedDate() {
-        return formattedDate;
-    }
-
-    public void setFormattedDate(String formattedDate) {
-        this.formattedDate = formattedDate;
-    }
-
     public boolean isReported() {
         return reported;
     }
 
     public void setReported(boolean reported) {
         this.reported = reported;
+    }
+
+    public List<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
     }
 }

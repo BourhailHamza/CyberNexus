@@ -1,6 +1,8 @@
 package com.cybernexus.models;
 
 import javax.persistence.*;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "users")
@@ -24,6 +26,23 @@ public class User {
 
     @Column
     private String bio;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChatRoom> createdChatRooms = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Message> messages = new HashSet<>();
+
+    @OneToMany(mappedBy = "reportedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Report> reports = new HashSet<>();
 
     public User() {
     }
@@ -74,5 +93,37 @@ public class User {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public Set<ChatRoom> getCreatedChatRooms() {
+        return createdChatRooms;
+    }
+
+    public void setCreatedChatRooms(Set<ChatRoom> createdChatRooms) {
+        this.createdChatRooms = createdChatRooms;
+    }
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }
+
+    public Set<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(Set<Report> reports) {
+        this.reports = reports;
     }
 }

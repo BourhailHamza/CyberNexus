@@ -7,51 +7,106 @@
   <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">CyberNexus</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/index">CyberNexus</a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="/profile">Perfil</a></li>
-      <li class="nav-item"><a class="nav-link" href="/create-chat-room">Créer un Salon</a></li>
-      <li class="nav-item"><a class="nav-link" href="/logout">Déconnecter</a></li>
+      <li class="nav-item"><a class="nav-link" href="/profile">Profil</a></li>
+      <li class="nav-item"><a class="nav-link" href="/logout">Déconnexion</a></li>
     </ul>
   </div>
 </nav>
 
-<div class="container mt-4">
-  <h1>Salon: <span th:text="${chatRoom.name}"></span></h1>
-  <p th:text="${chatRoom.description}"></p>
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h1>Salon : <span th:text="${chatRoom.name}"></span></h1>
+    <p th:text="${chatRoom.description}"></p>
+  </div>
 
-  <h3>Messages:</h3>
-  <ul class="list-group">
-    <li class="list-group-item" th:each="message : ${messages}">
-      <strong th:text="${message.user.username}">User</strong>:
-      <span th:text="${message.content}"></span>
-      <small class="text-muted" th:text="${message.formattedDate}"></small>
+  <h3 class="mb-4">Messages :</h3>
+  <div class="list-group mb-4">
+    <div class="list-group-item d-flex justify-content-between align-items-start" th:each="message : ${messages}">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold" th:text="${message.user.username}">Utilisateur</div>
+        <span th:text="${message.content}"></span>
+      </div>
+      <div class="btn-group">
+        <form th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}"
+              th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}"
+              method="post" class="d-inline">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+        </form>
+        <button type="button" class="btn btn-outline-warning btn-sm ms-2"
+                th:if="${message.user.id != #httpServletRequest.getSession().getAttribute('user').id}"
+                th:data-chatroom-id="${chatRoom.id}"
+                th:data-message-id="${message.id}"
+                th:disabled="${reportedMessages[message.id] != null}"
+                onclick="openReportModal(this)">Signaler</button>
+      </div>
+    </div>
+  </div>
 
-      <!-- Bouton de suppression si l'utilisateur est l'auteur -->
-      <form th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}"
-            th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}"
-            method="post" style="display: inline;">
-        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
-      </form>
-
-      <!-- Bouton de signalement pour tous les utilisateurs -->
-      <form th:action="@{/message/report/{id}(id=${message.id})}" method="post" style="display: inline;">
-        <button type="submit" class="btn btn-sm btn-warning" th:disabled="${message.reported}">Signaler</button>
-      </form>
-    </li>
-  </ul>
+  <!-- Modal pour saisir le motif du signalement -->
+  <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reportModalLabel">Signaler un Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reportForm" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div class="mb-3">
+              <label for="reason" class="form-label">Motif du signalement</label>
+              <textarea class="form-control" id="reason" name="reason" required></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <button type="button" class="btn btn-primary" onclick="submitReport()">Envoyer le Signalement</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Formulaire d'ajout de message -->
-  <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-3">
-    <textarea class="form-control" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
-    <button type="submit" class="btn btn-primary mt-2">Envoyer</button>
+  <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-5">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <textarea class="form-control mb-3" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary">Envoyer</button>
+    </div>
   </form>
 </div>
+
+<script>
+  function openReportModal(button) {
+    const chatRoomId = button.getAttribute('data-chatroom-id');
+    const messageId = button.getAttribute('data-message-id');
+
+    const form = document.getElementById('reportForm');
+    form.action = `/chat/${chatRoomId}/message/report/${messageId}`;
+
+    const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+    modal.show();
+  }
+
+  function submitReport() {
+    const reason = document.getElementById('reason').value.trim();
+    if (!reason) {
+      alert('Le motif du signalement est obligatoire.');
+      return;
+    }
+    const form = document.getElementById('reportForm');
+    form.submit();
+  }
+</script>
 
 <script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>

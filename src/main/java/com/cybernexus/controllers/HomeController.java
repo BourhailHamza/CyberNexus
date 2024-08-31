@@ -18,6 +18,8 @@ import javax.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 public class HomeController {
@@ -25,13 +27,25 @@ public class HomeController {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @GetMapping("/")
+    public String handleRoot(HttpSession session) {
+        // Verificar si el usuario está en la sesión
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser != null) {
+            return "redirect:/index";
+        } else {
+            return "redirect:/login";
+        }
+    }
+
     @GetMapping("/index")
     public String showIndex(Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
 
-        /*if (currentUser == null) {
+        if (currentUser == null) {
             return "redirect:/login";
-        }*/
+        }
 
         String query = "SELECT c FROM ChatRoom c";
         List<ChatRoom> chatRooms = entityManager.createQuery(query, ChatRoom.class).getResultList();
@@ -59,18 +73,24 @@ public class HomeController {
         List<Message> messages = entityManager.createQuery("SELECT m FROM Message m WHERE m.chatRoom.id = :chatRoomId", Message.class)
                 .setParameter("chatRoomId", id).getResultList();
 
-        // Formatage de la date
-        /*DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm");
-        for (Message message : messages) {
-            message.setFormattedDate(message.getCreatedAt().format(formatter));
-        }*/
+        Map<Long, Boolean> reportedMessages = new HashMap<>();
+        List<Long> reportedMessageIds = entityManager.createQuery(
+                        "SELECT r.message.id FROM Report r WHERE r.reportedBy.id = :userId", Long.class)
+                .setParameter("userId", currentUser.getId())
+                .getResultList();
+
+        for (Long messageId : reportedMessageIds) {
+            reportedMessages.put(messageId, true);
+        }
 
         model.addAttribute("user", currentUser);
         model.addAttribute("chatRoom", chatRoom);
         model.addAttribute("messages", messages);
+        model.addAttribute("reportedMessages", reportedMessages);
 
         return "chatRoom";
     }
+
 
     @PostMapping("/chat/{id}/message")
     @Transactional
@@ -135,9 +155,8 @@ public class HomeController {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setName(name);
         chatRoom.setDescription(description);
-        chatRoom.setCreatedBy(currentUser); // Establecemos el usuario como entidad relacionada
+        chatRoom.setCreatedBy(currentUser);
         chatRoom.setCreatedAt(LocalDateTime.now());
-        chatRoom.setUserId(currentUser.getId());
 
         entityManager.persist(chatRoom);
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
 <div class="container mt-5">
   <h1>Créer un nouveau salon</h1>
   <form action="/create-chat-room" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <div class="form-group">
       <label for="name">Nom du salon</label>
       <input type="text" class="form-control" id="name" name="name" required>

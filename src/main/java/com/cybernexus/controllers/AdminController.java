@@ -22,7 +22,7 @@ public class AdminController {
     public String viewReportedMessages(Model model) {
         List<Report> reports = entityManager.createQuery("SELECT r FROM Report r", Report.class).getResultList();
         model.addAttribute("reports", reports);
-        return "admin/reports";
+        return "admin";
     }
 
     @PostMapping("/message/delete/{id}")
@@ -31,6 +31,8 @@ public class AdminController {
         Message message = entityManager.find(Message.class, messageId);
         if (message != null) {
             entityManager.remove(message);
+        } else {
+            return "redirect:/admin/reports?error=messageNotFound";
         }
         return "redirect:/admin/reports";
     }
@@ -41,6 +43,8 @@ public class AdminController {
         Report report = entityManager.find(Report.class, reportId);
         if (report != null) {
             entityManager.remove(report);
+        } else {
+            return "redirect:/admin/reports?error=reportNotFound";
         }
         return "redirect:/admin/reports";
     }
