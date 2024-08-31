@@ -20,4 +20,4 @@ COPY --from=build /app/target/*.jar CyberNexus-1.0-SNAPSHOT.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/CyberNexus-1.0-SNAPSHOT.jar"]
