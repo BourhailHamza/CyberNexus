@@ -126,4 +126,5 @@ public class User {
     public void setReports(Set<Report> reports) {
         this.reports = reports;
     }
+
 }

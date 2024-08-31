@@ -2,10 +2,10 @@ package com.cybernexus.config;
 
 import com.cybernexus.models.User;
 import com.cybernexus.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,14 +15,16 @@ import java.util.Collection;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+
+    public CustomAuthenticationSuccessHandler(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         String username = authentication.getName();
-
         User user = userDetailsService.findUserByUsername(username);
 
         HttpSession session = request.getSession();
@@ -43,4 +45,5 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         response.sendRedirect(redirectURL);
     }
+
 }

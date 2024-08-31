@@ -15,8 +15,7 @@
             </div>
             <div class="card-body p-5">
                 <div th:if="${param.error}" class="alert alert-danger">
-                    <p th:if="${param.error == 'userNotFound'}">Utilisateur non trouvé.</p>
-                    <p th:if="${param.error == 'invalidPassword'}">Mot de passe invalide.</p>
+                    <p>Utilisateur ou mot de passe invalide.</p>
                 </div>
 
                 <form action="/login" method="post" th:action="@{/login}">

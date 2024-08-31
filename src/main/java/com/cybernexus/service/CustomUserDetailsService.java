@@ -9,8 +9,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -39,9 +43,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .getResultList();
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-//        for (String roleName : roleNames) {
-//            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
-//        }
+        for (String roleName : roleNames) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
@@ -61,5 +65,29 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         return users.get(0);
+    }
+
+    /**
+     * Met à jour le profil de l'utilisateur.
+     *
+     * @param updatedUser L'objet User contenant les nouvelles informations de l'utilisateur.
+     */
+    @Transactional
+    public void updateUserProfile(User updatedUser) {
+        User existingUser = entityManager.find(User.class, updatedUser.getId());
+        if (existingUser != null) {
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setBio(updatedUser.getBio());
+            existingUser.setProfilePicture(updatedUser.getProfilePicture());
+            entityManager.merge(existingUser);
+        } else {
+            throw new IllegalArgumentException("User not found with ID: " + updatedUser.getId());
+        }
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        return findUserByUsername(currentUsername);
     }
 }

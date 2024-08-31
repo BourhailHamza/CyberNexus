@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
@@ -29,7 +28,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String handleRoot(HttpSession session) {
-        // Verificar si el usuario está en la sesión
         User currentUser = (User) session.getAttribute("user");
 
         if (currentUser != null) {

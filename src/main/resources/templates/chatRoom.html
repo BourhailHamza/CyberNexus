@@ -7,45 +7,57 @@
   <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="/index">CyberNexus</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="/profile">Profil</a></li>
-      <li class="nav-item"><a class="nav-link" href="/logout">Déconnexion</a></li>
-    </ul>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/index">CyberNexus</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/profile">Profil</a></li>
+        <li class="nav-item"><a class="nav-link" href="/logout">Déconnexion</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
 <div class="container mt-5">
   <div class="text-center mb-4">
-    <h1>Salon : <span th:text="${chatRoom.name}"></span></h1>
-    <p th:text="${chatRoom.description}"></p>
+    <h1 class="display-4">Salon : <span th:text="${chatRoom.name}"></span></h1>
+    <p class="lead" th:text="${chatRoom.description}"></p>
   </div>
 
-  <h3 class="mb-4">Messages :</h3>
-  <div class="list-group mb-4">
-    <div class="list-group-item d-flex justify-content-between align-items-start" th:each="message : ${messages}">
-      <div class="ms-2 me-auto">
-        <div class="fw-bold" th:text="${message.user.username}">Utilisateur</div>
-        <span th:text="${message.content}"></span>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="card-title mb-3">Messages :</h3>
+
+      <div th:if="${messages.empty}" class="alert alert-info text-center">
+        Aucun message pour le moment. Soyez le premier à en envoyer !
       </div>
-      <div class="btn-group">
-        <form th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}"
-              th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}"
-              method="post" class="d-inline">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
-        </form>
-        <button type="button" class="btn btn-outline-warning btn-sm ms-2"
-                th:if="${message.user.id != #httpServletRequest.getSession().getAttribute('user').id}"
-                th:data-chatroom-id="${chatRoom.id}"
-                th:data-message-id="${message.id}"
-                th:disabled="${reportedMessages[message.id] != null}"
-                onclick="openReportModal(this)">Signaler</button>
+
+      <div class="list-group">
+        <div th:each="message : ${messages}"
+             th:classappend="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id} ? 'list-group-item d-flex justify-content-between align-items-start bg-info text-white' : 'list-group-item d-flex justify-content-between align-items-start bg-light text-dark'">
+          <div class="ms-2 me-auto">
+            <div class="fw-bold" th:text="${message.user.username}">Utilisateur</div>
+            <span th:text="${message.content}"></span>
+          </div>
+          <div class="btn-group">
+            <form th:if="${message.user.id == #httpServletRequest.getSession().getAttribute('user').id}"
+                  th:action="@{/chat/{chatRoomId}/message/delete/{messageId}(chatRoomId=${chatRoom.id}, messageId=${message.id})}"
+                  method="post" class="d-inline">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+            </form>
+            <button type="button" class="btn btn-warning btn-sm ms-2"
+                    th:if="${message.user.id != #httpServletRequest.getSession().getAttribute('user').id}"
+                    th:data-chatroom-id="${chatRoom.id}"
+                    th:data-message-id="${message.id}"
+                    th:disabled="${reportedMessages[message.id] != null}"
+                    onclick="openReportModal(this)">Signaler</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -76,13 +88,18 @@
   </div>
 
   <!-- Formulaire d'ajout de message -->
-  <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-5">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <textarea class="form-control mb-3" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
-    <div class="d-grid">
-      <button type="submit" class="btn btn-primary">Envoyer</button>
+  <div class="card shadow-sm mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Écrire un message :</h5>
+      <form th:action="@{/chat/{id}/message(id=${chatRoom.id})}" method="post" class="mt-3">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <textarea class="form-control mb-3" name="content" rows="3" placeholder="Écrire un message..." required></textarea>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 
 <script>

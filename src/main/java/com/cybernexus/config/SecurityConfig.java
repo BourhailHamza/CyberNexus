@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .antMatchers("/", "/index", "/register", "/login", "/css/**", "/js/**", "/webjars/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().hasRole("USER")
+                        .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
@@ -65,6 +65,6 @@ public class SecurityConfig {
 
     @Bean
     public CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
+        return new CustomAuthenticationSuccessHandler(customUserDetailsService);
     }
 }

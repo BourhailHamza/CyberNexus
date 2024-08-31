@@ -4,7 +4,6 @@ import com.cybernexus.models.Message;
 import com.cybernexus.models.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;

@@ -2,7 +2,6 @@ package com.cybernexus.controller;
 
 import com.cybernexus.models.User;
 import org.springframework.web.bind.annotation.*;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -18,7 +17,6 @@ public class UserController {
     @PostMapping("/create")
     @Transactional
     public User createUser(@RequestBody User user) {
-        // Stocker le mot de passe tel quel, sans le hacher
         entityManager.persist(user);
         return user;
     }
@@ -40,7 +38,6 @@ public class UserController {
             user.setUsername(updatedUser.getUsername());
             user.setEmail(updatedUser.getEmail());
 
-            // Mettre à jour le mot de passe directement
             if (updatedUser.getPasswordHash() != null && !updatedUser.getPasswordHash().isEmpty()) {
                 user.setPasswordHash(updatedUser.getPasswordHash());
             }
