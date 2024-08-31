@@ -16,7 +16,7 @@ FROM openjdk:8-jre-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar CyberNexus-1.0-SNAPSHOT.jar
 
 EXPOSE 8080
 
